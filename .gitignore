@@ -1,0 +1,21 @@
+# QSPICE build outputs
+*.dll
+*.obj
+*.exp
+*.lib
+
+# QSPICE simulation data
+*.qraw
+*.qopraw
+
+# Visual Studio Code
+.vscode/*
+!.vscode/tasks.json
+
+# Windows
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*~

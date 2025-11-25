@@ -6,20 +6,16 @@ This project implements a digital filter C-block for QSPICE circuit simulator us
 
 ```
 .
-├── src/
-│   └── digital_filter_x1.cpp    # Digital filter implementation
-├── schematics/
-│   ├── digital_filter.qsch      # Main filter schematic
-│   └── Untitled.qsch            # Additional schematic
-├── simulation_data/
-│   ├── digital_filter.qraw      # Simulation results
-│   ├── digital_filter.qopraw    # Operating point data
-│   ├── Untitled.qraw
-│   └── Untitled.qopraw
-├── build_qspice_dll.bat         # Build script
+├── digital_filter_x1.cpp        # Digital filter implementation
+├── digital_filter.qsch          # Main filter schematic
+├── build_qspice_dll.bat         # Build script for MSVC
+├── README.md                    # This file
+├── .gitignore                   # Git ignore rules
 └── .vscode/
-    └── tasks.json               # VS Code build tasks
+    └── tasks.json               # VS Code build tasks (Ctrl+Shift+B)
 ```
+
+**Note:** Build outputs (`.dll`, `.obj`, `.lib`, `.exp`) and simulation data (`.qraw`, `.qopraw`) are automatically ignored by git.
 
 ## Digital Filter Implementation
 
@@ -52,13 +48,13 @@ Where:
 
 Run the batch script:
 ```cmd
-build_qspice_dll.bat src\digital_filter_x1.cpp
+build_qspice_dll.bat digital_filter_x1.cpp
 ```
 
 ## Usage in QSPICE
 
 1. Build the DLL using VS Code or the batch script
-2. Open `schematics/digital_filter.qsch` in QSPICE
+2. Open `digital_filter.qsch` in QSPICE
 3. Run the simulation - QSPICE will automatically load the compiled DLL
 4. The DLL must be in the same directory as the schematic file
 
@@ -73,7 +69,7 @@ build_qspice_dll.bat src\digital_filter_x1.cpp
 
 To change filter behavior:
 
-1. Edit `src/digital_filter_x1.cpp`
+1. Edit `digital_filter_x1.cpp`
 2. Rebuild with `Ctrl+Shift+B`
 3. Rerun the simulation in QSPICE
 

@@ -38,7 +38,7 @@ int __stdcall DllMain(void *module, unsigned int reason, void *reserved) { retur
 static bool clk_last = false;
 static std::vector<double> w(50, 0.0);
 static std::vector<double> x(50, 0.0);
-static double mu = 0.001;
+static double mu = 0.01;
 static int div_counter = 0;
 const int DIV_RATIO = 10000;
 

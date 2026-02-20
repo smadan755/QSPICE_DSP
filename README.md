@@ -1,206 +1,152 @@
 # QSPICE Digital Signal Processing Project
 
-A collection of digital signal processing (DSP) and analog filter implementations for QSPICE circuit simulator using custom C++ DLLs and Python analysis tools.
+A collection of DSP, nonlinear dynamics, and analog filter implementations for the QSPICE circuit simulator using custom C++ DLLs, behavioral sources, and Python analysis tools.
 
 ## Project Structure
 
 ```
 .
-├── README.md                    # This file
-├── hello_filter/               # Simple IIR digital filter (starter example)
-│   ├── build_qspice_dll.bat    # Build script for MSVC
-│   ├── digital_filter_x1.cpp   # First-order IIR filter implementation
-│   └── digital_filter.qsch     # Filter schematic
-├── second_order/               # Adaptive LMS filter with second-order system
-│   ├── second_order_x1.cpp     # LMS adaptive filter (50-tap FIR)
+├── README.md
+├── hello_filter/                # Simple IIR digital filter (starter example)
+│   ├── digital_filter_x1.cpp   # First-order IIR low-pass filter
+│   ├── digital_filter.qsch     # Filter schematic
+│   └── build_qspice_dll.bat    # Build script for MSVC
+├── second_order/                # Adaptive LMS filter
+│   ├── second_order_x1.cpp     # 50-tap FIR LMS adaptive filter
 │   ├── second_order.qsch       # Adaptive filter test schematic
-│   ├── lms_sim.png            # Simulation results
 │   └── second_order.pfg        # Plot configuration
-├── active_filter/              # Active analog filter design and analysis
+├── active_filter/               # Active analog filter design
 │   ├── active_filter.qsch      # Op-amp based active filter schematic
-│   ├── test_filter.py          # Python filter analysis script
-│   └── test_filter.ipynb       # Jupyter notebook for filter design
-└── op_amp_math/               # Op-amp mathematical operations
-    └── op_amp.qsch            # Op-amp circuit schematic
+│   └── test_filter.py          # Python frequency response analysis
+├── butter/                      # Butterworth filter
+│   └── butter.qsch             # Butterworth filter schematic
+├── op_amp_math/                 # Op-amp mathematical operations
+│   └── op_amp.qsch             # Op-amp circuit schematic
+├── wavegen/                     # Digital waveform generator
+│   ├── wavegen_x1.cpp          # Recursive sine oscillator (Goertzel)
+│   └── wavegen.qsch            # Waveform generator schematic
+├── fringe_counting/             # Optical interferometric sensor simulation
+│   ├── fringe_counting_x1.cpp  # Fabry-Perot fringe counting model
+│   ├── fringe_counting.qsch    # Fringe counting schematic
+│   ├── sia_sensor.qsch         # SIA sensor schematic
+│   └── debug.py                # Python verification/plotting script
+└── duffing/                     # Duffing oscillator & nonlinear transmission line
+    ├── duffing_base.qsch       # Single Duffing oscillator (sharkfin response)
+    ├── duffing.qsch            # 8-section NLTL frequency comb generator
+    ├── plot_comb.py            # PyQSPICE-based FFT analysis with comb quality metrics
+    └── analyze_comb.ipynb      # Jupyter notebook for comb analysis
 ```
 
-**Note:** Build outputs (`.dll`, `.obj`, `.lib`, `.exp`) and simulation data (`.qraw`, `.qopraw`) are generated in their respective directories.
-
-## Features
+## Modules
 
 ### 1. Hello Filter (First-Order IIR)
-A simple introductory digital filter implementing a basic IIR (Infinite Impulse Response) filter:
+
+A simple introductory digital filter implementing a basic IIR low-pass filter:
 - **Algorithm**: `OUT = (1-a) * IN + a * y_last`
 - **Filter coefficient**: `a = 0.90`
-- **Type**: Low-pass filter
 - **Use case**: Learning basic digital filter concepts in QSPICE
 
-### 2. Adaptive LMS Filter (Second-Order System)
-Advanced adaptive filtering using the Least Mean Squares (LMS) algorithm:
+### 2. Adaptive LMS Filter
+
+Advanced adaptive filtering using the Least Mean Squares algorithm:
 - **Architecture**: 50-tap FIR filter
-- **Algorithm**: LMS adaptive filtering for system identification
-- **Features**:
-  - Real-time weight adaptation
-  - Clock division (10,000:1) for convergence stability
-  - Error signal output for convergence monitoring
-- **Use case**: Adaptive noise cancellation, system identification, echo cancellation
+- **Learning rate**: mu = 0.001
+- **Clock division**: 10,000:1 for convergence stability
+- **Outputs**: Estimated signal and real-time error for convergence monitoring
+- **Use case**: System identification, adaptive noise cancellation
 
-### 3. Active Analog Filters
-Op-amp based active filter design with Python analysis:
-- **Components**: Op-amp circuits with R, L, C components
-- **Analysis Tools**: 
-  - Python scripts for frequency response analysis
-  - Jupyter notebooks for interactive filter design
-  - Transfer function calculations
-- **Use case**: Analog filter prototyping, frequency response analysis
+### 3. Active Analog Filter
 
-### 4. Op-Amp Mathematical Operations
+Op-amp based active filter with Python frequency response analysis:
+- Inverting amplifier topology with impedance feedback (L input, RC feedback)
+- Python script computes and plots the transfer function H(s) = -Z_f / Z_in
+
+### 4. Butterworth Filter
+
+Butterworth filter schematic for maximally-flat magnitude response design.
+
+### 5. Op-Amp Mathematical Operations
+
 Circuit implementations of mathematical operations using operational amplifiers.
 
-## Digital Filter Implementation
+### 6. Waveform Generator (Goertzel Oscillator)
 
-### Hello Filter (Simple IIR)
+A digital sine wave generator using a recursive second-order IIR structure:
+- **Algorithm**: `y[n] = 2*cos(w)*y[n-1] - y[n-2] + sin(w)*x[n-1]`
+- **Frequency**: omega = pi/8 (fixed)
+- Generates a pure sine wave from a single impulse input using only multiplies and adds
 
-The filter implements a simple IIR (Infinite Impulse Response) digital filter with the equation:
+### 7. Fringe Counting (Optical Interferometric Sensor)
 
-```
-OUT = (1-a) * IN + a * y_last
-```
+Simulates a Fabry-Perot interferometric displacement sensor:
+- Models optical phase from mechanical displacement: `phase = 4*pi*(d_bias + x) / lambda`
+- Photodetector output: `V_pd = cos^2(phase)`
+- Spring constant k = 516.5 N/m, wavelength lambda = 850 nm
+- Includes TIA (transimpedance amplifier) readout stage
+- Python debug script for independent waveform verification
 
-Where:
-- `a = 0.90` (filter coefficient)
-- `IN` is the input signal
-- `OUT` is the filtered output
-- The filter is clocked and updates on the rising edge of CLK
+### 8. Duffing Oscillator & NLTL Frequency Comb
 
-### Adaptive LMS Filter
+Nonlinear dynamics simulations based on the Duffing equation:
 
-The second-order project implements a 50-tap FIR adaptive filter using the LMS algorithm:
+**Single Oscillator** (`duffing_base.qsch`):
+- Series RLC loop: V1 -> L1 -> R1 -> B1 -> C1 -> GND
+- B1 implements hardening spring: `V = V(x) + V(x)**3`
+- Produces the classic sharkfin frequency response with hysteresis
+- Node `x` (between B1 and C1) represents displacement
+- Equation: `x'' + delta*x' + x + beta*x^3 = gamma*sin(wt)`
 
-```cpp
-// Prediction: y_est = Σ(w[i] * x[i])
-// Error: e = desired - y_est
-// Weight Update: w[i] = w[i] + μ * e * x[i]
-```
+**NLTL Frequency Comb** (`duffing.qsch`):
+- 8-section nonlinear transmission line (LC ladder with Duffing shunt capacitors)
+- Each section: inductor in series, B+C pair shunting to ground
+- B sources: `V = -0.1*V(xN)**2 - 0.05*V(xN)**3` (quadratic + cubic nonlinearity)
+- Generates frequency combs at harmonics of the drive frequency
+- Source and load impedance matched to Z0 = sqrt(L/C)
 
-Parameters:
-- **Filter length**: 50 taps
-- **Learning rate (μ)**: 0.001
-- **Clock division**: 10,000:1 for stable convergence
-- **Outputs**: Estimated signal and error for monitoring
+**Python Analysis** (`plot_comb.py`):
+- Reads simulation data via PyQSPICE
+- FFT with Hanning window and steady-state extraction
+- Comb quality metrics: tooth count, amplitude flatness, per-tooth SNR, spacing accuracy (ppm)
 
 ## Building
 
 ### Prerequisites
 
-- **QSPICE** - Circuit simulator ([download here](https://www.qorvo.com/products/design-tools/qspice))
-- **Microsoft Visual Studio 2022** (Community Edition or higher) with C++ tools
-- **Python 3.x** (optional, for active filter analysis)
-  - NumPy
-  - Matplotlib
-  - Jupyter (for notebook analysis)
+- [QSPICE](https://www.qorvo.com/products/design-tools/qspice) circuit simulator
+- Microsoft Visual Studio 2022 (Community Edition or higher) with C++ tools
+- Python 3.x with NumPy, Matplotlib (for analysis scripts)
+- [PyQSPICE](https://pypi.org/project/PyQSPICE/) (for duffing/plot_comb.py)
 
-### Build in VS Code
+### Build DLLs
 
-1. Open this folder in VS Code
-2. Press `Ctrl+Shift+B` or select **Terminal → Run Build Task**
-3. The DLL will be compiled as `digital_filter_x1.dll`
+From VS Code: `Ctrl+Shift+B` runs the build task.
 
-### Build from Command Line
-
-Navigate to the project directory (e.g., `hello_filter/` or `second_order/`) and run:
+From command line:
 ```cmd
 cd hello_filter
 build_qspice_dll.bat digital_filter_x1.cpp
 ```
 
-Or for the adaptive filter:
+### Run in QSPICE
+
+1. Build the DLL (must be in same directory as `.qsch`)
+2. Open the `.qsch` file in QSPICE
+3. Run the simulation
+
+### Python Analysis
+
 ```cmd
-cd second_order
-build_qspice_dll.bat second_order_x1.cpp
+cd duffing
+python plot_comb.py
 ```
-
-## Usage in QSPICE
-
-### Digital Filters (C++ DLL)
-
-1. Build the DLL using VS Code or the batch script
-2. Open the corresponding `.qsch` file in QSPICE:
-   - `hello_filter/digital_filter.qsch` for basic IIR filter
-   - `second_order/second_order.qsch` for adaptive LMS filter
-3. Run the simulation - QSPICE will automatically load the compiled DLL
-4. The DLL must be in the same directory as the schematic file
-
-### Active Filter Analysis (Python)
-
-1. Navigate to `active_filter/` directory
-2. Run the Python script:
-   ```cmd
-   python test_filter.py
-   ```
-3. Or open `test_filter.ipynb` in Jupyter for interactive analysis:
-   ```cmd
-   jupyter notebook test_filter.ipynb
-   ```
 
 ## Technical Notes
 
-### Digital Filter DLLs
-
-- **32-bit DLL Required**: QSPICE is a 32-bit application, so the DLL must be compiled for x86 (32-bit)
-- **Calling Convention**: Uses `extern "C" __declspec(dllexport)` for proper linking
-- **Static Variables**: Filter state is maintained in static variables between calls
-- **Clock-Triggered**: Filters update on the rising edge of the CLK signal
-
-### LMS Adaptive Filter
-
-- **Convergence**: Uses clock division (10,000:1) to slow down adaptation for stable convergence
-- **Filter Order**: 50-tap FIR provides good balance between performance and computation
-- **Learning Rate**: μ = 0.001 chosen for stable convergence
-- **Error Monitoring**: Secondary output provides real-time error signal for convergence analysis
-
-## Modifying the Filters
-
-### Simple IIR Filter
-
-To change filter behavior in `hello_filter/`:
-
-1. Edit `hello_filter/digital_filter_x1.cpp`
-2. Rebuild with `Ctrl+Shift+B`
-3. Rerun the simulation in QSPICE
-
-Common modifications:
-- Change `a` coefficient for different filtering characteristics
-- Implement different filter types (Butterworth, Chebyshev, etc.)
-- Add additional states for higher-order filters
-
-### Adaptive LMS Filter
-
-To modify the adaptive filter in `second_order/`:
-
-1. Edit `second_order/second_order_x1.cpp`
-2. Adjust parameters:
-   - `w.size()`: Change filter length (number of taps)
-   - `mu`: Adjust learning rate for faster/slower convergence
-   - `DIV_RATIO`: Modify clock division for convergence speed
-3. Rebuild and test in QSPICE
-
-### Active Filters
-
-Modify Python scripts in `active_filter/` to:
-- Change component values (R, L, C)
-- Analyze different frequency ranges
-- Plot magnitude and phase responses
-- Design custom transfer functions
-
-## Applications
-
-- **Adaptive Noise Cancellation**: Use LMS filter to remove noise from desired signals
-- **System Identification**: Model unknown systems using adaptive filtering
-- **Active Filter Design**: Prototype and analyze op-amp based analog filters
-- **Digital Filter Learning**: Understand DSP concepts with hands-on QSPICE simulations
-- **Echo Cancellation**: Implement adaptive echo cancellation systems
-- **Signal Conditioning**: Design custom filters for sensor signal processing
+- **32-bit DLLs**: QSPICE requires x86 (32-bit) DLLs
+- **Calling convention**: `extern "C" __declspec(dllexport)`
+- **Clock-triggered**: All digital filters update on the rising edge of CLK
+- **Behavioral sources**: Duffing circuits use QSPICE behavioral voltage sources (B) for nonlinear elements
+- **PyQSPICE**: Uses QUX.exe to export .qraw data into uniform-sampled pandas DataFrames (better for FFT than raw adaptive-step data)
 
 ## License
 

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:en.wikipedia.org)",
+      "WebFetch(domain:www.scholarpedia.org)",
+      "WebFetch(domain:physics.csuchico.edu)",
+      "WebFetch(domain:www.cfm.brown.edu)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:forum.qorvo.com)",
+      "WebFetch(domain:spicelib.readthedocs.io)",
+      "Bash(python -m pip:*)",
+      "Bash(python -c:*)",
+      "Bash(python:*)",
+      "Bash(ls:*)",
+      "Bash(dir /AD /B \"C:\\\\Users\\\\madan\\\\Documents\\\\QSPICE\\\\QSPICE_DSP\")"
+    ]
+  }
+}

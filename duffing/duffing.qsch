@@ -788,5 +788,6 @@
   «text (200,-800) 1 7 0 0x1000000 -1 -1 "ï»¿.meas tran amplitude PP V(x13) from=5 to=10"»
   «text (200,-1150) 1 7 0 0x1000000 -1 -1 "ï»¿.options reltol=0.00001"»
   «text (200,-1400) 1 7 0 0x1000000 -1 -1 "ï»¿.param freq=10"»
+  «text (200,-1000) 1 7 0 0x1000000 -1 -1 "ï»¿.options maxstep=0.00001"»
 »
 

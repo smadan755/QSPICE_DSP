@@ -99,7 +99,7 @@ Nonlinear dynamics simulations based on the Duffing equation:
 **NLTL Frequency Comb** (`duffing.qsch`):
 - 8-section nonlinear transmission line (LC ladder with Duffing shunt capacitors)
 - Each section: inductor in series, B+C pair shunting to ground
-- B sources: `V = -0.1*V(xN)**2 - 0.05*V(xN)**3` (quadratic + cubic nonlinearity)
+- B sources: `V = -0.5*V(xN)**3` (cascaded cubic nonlinearity)
 - Generates frequency combs at harmonics of the drive frequency
 - Source and load impedance matched to Z0 = sqrt(L/C)
 
